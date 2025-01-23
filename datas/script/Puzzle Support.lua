@@ -19,7 +19,7 @@ end
 function Debug.LoadDeck(tp,filename,isdeck_fromreplay)
 	if string.sub(filename,-4)~=".ydk" then return end
 	local deckfile=io.open("puzzles/"..filename,"r")
-	if not deckfile then deckfile=io.open("deck/"..filename,"r")
+	if not deckfile then deckfile=io.open("deck/"..filename,"r") end
     if not deckfile then return end
 	local deck_table={["nil"]={}}
 	local phase="nil"
