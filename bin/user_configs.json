@@ -1,0 +1,69 @@
+{
+	"repos": [
+		{
+			"url": "https://github.com/Team-AllYGOPro/edopro-korean",
+			"repo_name": "한국어 패치",
+			"repo_path": "./repositories/languages/한국어",
+			"is_language": true,
+			"language": "한국어",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/Team-AllYGOPro/edopro-korean-delta",
+			"repo_name": "한국어 패치 (델타 테스트)",
+			"repo_path": "./repositories/languages/한국어-1",
+			"is_language": true,
+			"language": "한국어",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/CCC-Server/EMP-TY",
+			"repo_name": "추가 한국어 패치",
+			"repo_path": "./repositories/languages/한국어-2",
+			"is_language": true,
+			"language": "한국어",
+			"should_update": false,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/CCC-Server/CCC-Libraries",
+			"repo_name": "자작 카드용 라이브러리",
+			"repo_path": "./repositories/CCC-Libraries",
+			"data_path": "datas/database",
+			"script_path": "datas/script",
+			"pics_path": "pics/pics",
+			"should_update": true,
+			"should_read": true
+		},
+		{
+			"url": "https://github.com/CCC-Server/EMP-TY",
+			"repo_name": "커스텀 확장팩",
+			"repo_path": "./expansions-2",
+			"data_path": "",
+			"pics_path": "pics",
+			"script_path": "script",
+			"should_update": false,
+			"should_read": true
+		}
+	],
+	"urls": [
+		{
+			"url": "https://raw.githubusercontent.com/CCC-Server/CCC-Libraries/main/pics/field/{}.png",
+			"type": "field"
+		},
+		{
+			"url": "https://raw.githubusercontent.com/CCC-Server/CCC-Libraries/main/pics/field/{}.jpg",
+			"type": "field"
+		},
+		{
+			"url": "https://raw.githubusercontent.com/CCC-Server/CCC-Libraries/main/pics/cover/{}.jpg",
+			"type": "cover"
+		},
+		{
+			"url": "https://raw.githubusercontent.com/CCC-Server/EMP-TY/main/pics/field/{}.png",
+			"type": "field"
+		}
+	]
+}
