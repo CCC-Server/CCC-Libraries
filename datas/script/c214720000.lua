@@ -85,7 +85,18 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
 				Duel.ConfirmCards(1-tp,tc)
 			else
-				Duel.SSet(tp,tc)
+				Duel.SSet(tp,tc,tp,true)
+				local e1=Effect.GlobalEffect()
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				if tc:IsQuickPlaySpell() then
+					e1:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
+				elseif tc:IsTrap() then
+					e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+				end
+				e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+				e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+				e1:SetDescription(99) --"Activate using a generic effect"
+				tc:RegisterEffect(e1,true)
 			end
 		end
 	end
