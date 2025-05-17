@@ -86,20 +86,16 @@ local acop_create=function(ge,te,tep)
 		local eff_t={te:GetHandler():IsHasEffect(EFFECT_ACT_IN_RANGE)}
 		local sel_t,res_t={},{}
 		for key,eff in ipairs(eff_t) do
-			local con=eff:GetCondition()
+			local con=eff:GetCondition() or aux.TRUE
 			local desc=eff:GetDescription()
 			if desc==0 then desc=99 end --"Activate using a generic effect"
-			if not con or con(eff) then
-				table.insert(sel_t,{true,desc})
-				table.insert(res_t,eff)
-			end
+			table.insert(sel_t,{con,desc})
+			table.insert(res_t,eff)
 		end
-		local sel=1
-		if #sel_t>1 then sel=Duel.SelectEffect(tp,table.unpack(sel_t)) end
-		local eff=res_t[sel]
-		local op=nil
-		if eff then op=eff:GetValue() end
-		if op and type(op)=="function" then op(eff,te:GetHandler(),te) end
+		local sel=Duel.SelectEffect(tp,table.unpack(sel_t))
+		local re=res_t[sel]
+		local op=re and re:GetValue()
+		if op and type(op)=="function" then op(re,te:GetHandler(),te) end
 	end
 end
 local acchk=function(e,te,tp)
