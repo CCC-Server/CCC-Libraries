@@ -21,6 +21,9 @@ local cpcon=function(e,tp,eg,ep,ev,re,r,rp)
 	if te:IsActiveType(TYPE_FIELD) then
 		e:SetProperty(prop1,prop2|EFFECT_FLAG2_FORCE_ACTIVATE_LOCATION)
 		e:SetValue(LOCATION_FZONE)
+	elseif te:IsActiveType(TYPE_PENDULUM) then
+		e:SetProperty(prop1,prop2|EFFECT_FLAG2_FORCE_ACTIVATE_LOCATION)
+		e:SetValue(LOCATION_PZONE)
 	else
 		e:SetProperty(prop1,prop2)
 		e:SetValue(te:GetValue())
@@ -85,7 +88,7 @@ local acop_create=function(ge,te,tep)
 		for key,eff in ipairs(eff_t) do
 			local con=eff:GetCondition()
 			local desc=eff:GetDescription()
-			if desc==0 then desc=99 end
+			if desc==0 then desc=99 end --"Activate using a generic effect"
 			if not con or con(eff) then
 				table.insert(sel_t,{true,desc})
 				table.insert(res_t,eff)
