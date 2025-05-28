@@ -40,6 +40,7 @@ end
 function s.prdop(e,tp,eg,ep,ev,re,r,rp)
 	--ask if you want to activate the skill or not
 	local ct=Duel.GetDrawCount(tp)
+	if Duel.IsDuelType(DUEL_DRAW_UNTIL_5) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_DRAW_COUNT) then ct=math.max(ct,5-Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)) end
 	local dg=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_DECK,0,nil)
 	if ct>#dg or not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
 	Duel.Hint(HINT_CARD,tp,id)
