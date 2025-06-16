@@ -99,5 +99,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 				tc:RegisterEffect(e1,true)
 			end
 		end
+		Duel.Readjust()
 	end
 end
