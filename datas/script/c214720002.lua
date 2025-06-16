@@ -13,14 +13,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.flipop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
-	Duel.Hint(HINT_CARD,tp,id)
 	if Duel.GetFlagEffect(tp,id)==0 then
 		local valid=not Duel.IsExistingMatchingCard(function(c)
 			local code=c:GetOriginalCode()
 			return (code<160000000 or code>160999999) and not c:IsOriginalType(TYPE_SKILL)
 		end,tp,LOCATION_ALL,0,1,nil)
 		if valid then
+			Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
+			Duel.Hint(HINT_CARD,tp,id)
 			--predraw
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -61,7 +61,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 			--Invalid Skill
 			local e6=Effect.CreateEffect(e:GetHandler())
 			e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-			e6:SetDescription(aux.Stringid(id,0))
+			e6:SetDescription(aux.Stringid(id+1,0))
 			e6:SetCode(0)
 			e6:SetTargetRange(1,0)
 			Duel.RegisterEffect(e6,tp)
