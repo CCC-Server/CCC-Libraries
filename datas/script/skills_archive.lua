@@ -5,7 +5,7 @@ SKILL_COVER_ARCHIVE_START    = 301000003
 SKILL_COVER_ARCHIVE_ACTIVATE = 302000003
 
 -- specified skills
-SKILL_LUCKY_DAY = 300102004
+--SKILL_LUCKY_DAY = 300102004
 
 -- proc for memorize starting LP
 Duel.GetStartingLP=nil
@@ -22,6 +22,7 @@ Auxiliary.addStartingLPCheck=function()
 end
 
 -- proc for choose dice/coin
+--[[
 local luckyday_check=false
 local addLuckyDayCheck_Phase={}
 Auxiliary.addLuckyDayCheck=function()
@@ -70,3 +71,4 @@ addLuckyDayCheck_Phase[3]=function()
 	--To do...
 
 end
+--]]

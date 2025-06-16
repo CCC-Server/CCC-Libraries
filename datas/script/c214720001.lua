@@ -11,13 +11,6 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_SKILL)
 	e1:SetOperation(s.flipop)
 	c:RegisterEffect(e1)
-	aux.GlobalCheck(s,function()
-		--predraw
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(0)
-		Duel.RegisterEffect(ge1,0)
-	end)
 end
 function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
@@ -47,7 +40,7 @@ function s.prdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
 	local sg=dg:Select(tp,ct,ct,false,nil)
 	if sg and #sg>0 then
-		Duel.ShuffleDeck(tp)
+		Duel.DisableShuffleCheck()
 		Duel.MoveToDeckTop(sg)
 		if #sg>1 then Duel.SortDecktop(tp,tp,#sg) end
 	end
