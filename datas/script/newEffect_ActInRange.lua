@@ -37,20 +37,15 @@ local cpcon=function(e,tp,eg,ep,ev,re,r,rp)
 	if con then result=result and con(e,tp,eg,ep,ev,re,r,rp) end
 	return result
 end
-local cpcost_create=function(ge)
-	return function(e,tp,eg,ep,ev,re,r,rp,chk)
-		ge:SetLabelObject(e)
-		local te=e:GetHandler():GetActivateEffect()
-		local cost=te:GetCost()
-		local result=true
-		if chk==0 then
-			if cost then result=cost(e,tp,eg,ep,ev,re,r,rp,0) end
-			ge:SetLabelObject(nil)
-			return result
-		end
-		if cost then cost(e,tp,eg,ep,ev,re,r,rp,1) end
-		ge:SetLabelObject(nil)
+local cpcost=function(e,tp,eg,ep,ev,re,r,rp,chk)
+	local te=e:GetHandler():GetActivateEffect()
+	local cost=te:GetCost()
+	local result=true
+	if chk==0 then
+		if cost then result=cost(e,tp,eg,ep,ev,re,r,rp,0) end
+		return result
 	end
+	if cost then cost(e,tp,eg,ep,ev,re,r,rp,1) end
 end
 local cptg=function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local te=e:GetHandler():GetActivateEffect()
@@ -77,9 +72,6 @@ local grtg=function(e,tc)
 	return tc:GetEffectCount(EFFECT_ACT_IN_RANGE)>0
 		and not tc:IsLocation(LOCATION_HAND|LOCATION_SZONE)
 end
-local actg=function(e,te,tp)
-	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:GetHandler():GetEffectCount(EFFECT_ACT_IN_RANGE)>0
-end
 local acop_create=function(ge,te,tep)
 	return function(e,tp,eg,ep,ev,re,r,rp)
 		if not te then return end
@@ -95,14 +87,14 @@ local acop_create=function(ge,te,tep)
 		local sel=Duel.SelectEffect(tp,table.unpack(sel_t))
 		local re=res_t[sel]
 		local op=re and re:GetValue()
-		if op and type(op)=="function" then op(re,te:GetHandler(),te) end
+		if op and type(op)=="function" then op(re,te,tep) end
 	end
 end
-local acchk=function(e,te,tp)
+local actg=function(e,te,tp)
+	local result=te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:GetHandler():GetEffectCount(EFFECT_ACT_IN_RANGE)>0
 	e:SetOperation(acop_create(e,te,tp))
-	return true
+	return result
 end
---function(s)
 function newEffect.ActInRange.EnableCheck()
 	if CheckEnabled then return end
 	CheckEnabled=true
@@ -123,9 +115,10 @@ function newEffect.ActInRange.EnableCheck()
 	ge2:SetCode(EVENT_FREE_CHAIN)
 	ge2:SetRange(LOCATION_ALL)
 	ge2:SetCondition(cpcon)
-	ge2:SetCost(cpcost_create(ge1))
+	ge2:SetCost(cpcost)
 	ge2:SetTarget(cptg)
 	ge2:SetOperation(cpop)
+	ge2:SetLabelObject(ge1)
 	--Grant effect
 	ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	ge3:SetTargetRange(LOCATION_ALL,LOCATION_ALL)
@@ -138,7 +131,6 @@ function newEffect.ActInRange.EnableCheck()
 	ge4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	ge4:SetTargetRange(1,1)
 	ge4:SetTarget(actg)
-	ge4:SetCost(acchk)
 	Duel.RegisterEffect(ge4,0)
 end
 function newEffect.ActInRange.LimitCon()
@@ -147,7 +139,7 @@ function newEffect.ActInRange.LimitCon()
 	end
 end
 function newEffect.ActInRange.LimitOp()
-	return function(e,c,re)
+	return function(e,te,tp)
 		Duel.Hint(HINT_CARD,0,e:GetOwner():GetOriginalCode())
 		e:UseCountLimit(e:GetHandlerPlayer(),1)
 	end
