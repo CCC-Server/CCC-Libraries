@@ -1,15 +1,19 @@
 Duel.LoadScript("proc_newEffect.lua")
+
 --Declaration
 if newEffect.ActInRange then return end
 newEffect.ActInRange = {}
 --Constant(s)
 EFFECT_ACT_IN_RANGE  = newEffect.newCode()
 local CheckEnabled   = false
+
 --local function(s)
+--ge1 : Cannot cost itself
 local vctg=function(e,c)
 	local te=e:GetLabelObject()
 	return te and te:GetHandler()==c
 end
+--ge2 : Activate from LOCATION_ALL
 local cpcon=function(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local te=c:GetActivateEffect()
@@ -68,10 +72,12 @@ local cpop=function(e,tp,eg,ep,ev,re,r,rp)
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 end
+--ge3 : Grant effect
 local grtg=function(e,tc)
 	return tc:GetEffectCount(EFFECT_ACT_IN_RANGE)>0
-		and not tc:IsLocation(LOCATION_HAND|LOCATION_SZONE)
+		and not (tc:IsLocation(LOCATION_HAND) or (tc:IsLocation(LOCATION_SZONE) and tc:IsFaceup()))
 end
+--ge4 : Local cost
 local acop_create=function(ge,te,tep)
 	return function(e,tp,eg,ep,ev,re,r,rp)
 		if not te then return end
@@ -95,6 +101,8 @@ local actg=function(e,te,tp)
 	e:SetOperation(acop_create(e,te,tp))
 	return result
 end
+
+--public functions
 function newEffect.ActInRange.EnableCheck()
 	if CheckEnabled then return end
 	CheckEnabled=true
