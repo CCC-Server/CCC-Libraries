@@ -16,21 +16,24 @@ local ge4=nil
 --local function(s)
 --ge4 : Local cost
 local actg=function(e,te,tp)
-	return te==e:GetLabelObject()
+	return te:GetLabelObject()==e
 end
 local acop_create=function(ge,te,tep,...)
 	local eff_t={...}
-	return function(e,tp,eg,ep,ev,re,r,rp)
-		--Check local cost
-		if not te then return end
-		local sel_t,res_t={},{}
-		for key,eff in ipairs(eff_t) do
-			local con=eff:GetCondition() or aux.TRUE
-			local desc=eff:GetDescription()
-			if desc==0 then desc=99 end --"Activate using a generic effect"
-			table.insert(sel_t,{con,desc})
+	--Check local cost
+	local sel_t,res_t={},{}
+	for key,eff in ipairs(eff_t) do
+		local con=eff:GetCondition() or aux.TRUE
+		local desc=eff:GetDescription()
+		if desc==0 then desc=99 end --"Activate using a generic effect"
+		if con(eff) then
+			table.insert(sel_t,{true,desc})
 			table.insert(res_t,eff)
 		end
+	end
+	return function(e,tp,eg,ep,ev,re,r,rp)
+		if not te then return end
+		--Check local cost
 		local sel=Duel.SelectEffect(tp,table.unpack(sel_t))
 		local re=res_t[sel]
 		local op=re and re:GetValue()
@@ -49,7 +52,6 @@ local cpcon=function(e,tp,eg,ep,ev,re,r,rp)
 	local eff_t={te:GetHandler():IsHasEffect(EFFECT_ACT_IN_RANGE)}
 	local result=(#eff_t>0)
 	if not result then return false end
-
 	--Copy effect parameters
 	e:SetDescription(te:GetDescription())
 	e:SetCategory(te:GetCategory())
@@ -80,10 +82,10 @@ local cpcon=function(e,tp,eg,ep,ev,re,r,rp)
 	end
 	--Create local cost operation
 	if result then
-		ge4:SetLabelObject(e)
+		e:SetLabelObject(ge4)
 		ge4:SetOperation(acop_create(e,te,tp,table.unpack(eff_t)))
 	else
-		ge4:SetLabelObject(nil)
+		e:SetLabelObject(nil)
 		ge4:SetOperation(nil)
 	end
 	return result
