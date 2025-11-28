@@ -7,7 +7,7 @@ local checkmax = function(t,limit)
 	if not t or not limit then return true end
 	if type(t)~="table" then return false end
 	for _,v in pairs(t) do
-		--여기다 비정수 상수 같은 걸 집어넣으시는 분은, 디버그 용도 외에는 없길 바랍니다
+		--unsigned integer v
 		if v > limit then return false end
 	end
 	return true
@@ -115,57 +115,24 @@ local getCodesFromArchetype = function(archetype)
 	end
 	return rest
 end
---Functions like c420.lua
---[[
-Card.GetOriginalArchetype=function(c)
-	--to do
-end
-Card.GetPreviousArchetype=function(c)
-	--to do
-end
-Card.GetArchetype=function(c)
-	--to do
-end
---]]
-Card.IsArchetype=function(c,archetype,scard,sumtype,playerid)
+--A function like those in c420.lua, localized
+local IsArchetype=function(c,archetype,sumcard,sumtype,playerid)
 	sumtype=sumtype or 0
 	playerid=playerid or PLAYER_NONE
 	for _,sc in pairs(getSetcodesFromArchetype(archetype)) do
-		if c:IsSetCard(sc,scard,sumtype,playerid) then return true end
+		if sc & archetype ~= archetype or sc % 0x1000 ~= archetype % 0x1000 then --avoid loop self
+			if c:IsSetCard(sc,sumcard,sumtype,playerid) then return true end
+		end
 	end
 	for _,cd in pairs(getCodesFromArchetype(archetype)) do
-		if c:IsSummonCode(scard,sumtype,playerid,cd) then return true end
-	end
-	return false
-end
-Card.IsLinkArchetype=function(c,archetype)
-	for _,sc in pairs(getSetcodesFromArchetype(archetype)) do
-		if c:IsLinkSetCard(sc) then return true end
-	end
-	for _,cd in pairs(getCodesFromArchetype(archetype)) do
-		if c:IsLinkCode(cd) then return true end
-	end
-	return false
-end
-Card.IsOriginalArchetype=function(c,archetype)
-	for _,sc in pairs(getSetcodesFromArchetype(archetype)) do
-		if c:IsOriginalSetCard(sc) then return true end
-	end
-	for _,cd in pairs(getCodesFromArchetype(archetype)) do
-		if c:IsOriginalCodeRule(cd) then return true end
-	end
-	return false
-end
-Card.IsPreviousArchetype=function(c,archetype)
-	for _,sc in pairs(getSetcodesFromArchetype(archetype)) do
-		if c:IsPreviousSetCard(sc) then return true end
-	end
-	for _,cd in pairs(getCodesFromArchetype(archetype)) do
-		if c:IsPreviousCodeOnField(cd) then return true end
+		if c:IsSummonCode(sumcard,sumtype,playerid,cd) then return true end
 	end
 	return false
 end
 --Register Archetype
+local sccon=function(sumcard,sumtype,playerid)
+	return IsArchetype(tc,e:GetValue(),sumcard,sumtype,playerid)
+end
 Archetype.MakeCheck = function(archetype,codes,setcodes)
 	if not archetype or archetype % 0x1000 == 0 then return false end
 	if not checkmax(codes,0x7fffffff) or not checkmax(setcodes,0xffff) then return false end
@@ -176,6 +143,13 @@ Archetype.MakeCheck = function(archetype,codes,setcodes)
 			["setcodes"] = setcodes
 		}
 		result=true
+		local ge=Effect.GlobalEffect()
+		ge:SetType(EFFECT_TYPE_FIELD)
+		ge:SetProperty(EFFECT_FLAG_IGNORE_RANGE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE)
+		ge:SetCode(EFFECT_ADD_SETCODE)
+		ge:SetValue(archetype)
+		ge:SetOperation(sccon)
+		Duel.RegisterEffect(ge,0)
 	else
 		if codes then
 			local newt1, res1 = codes_merge(archtable[archetype].codes,codes)
