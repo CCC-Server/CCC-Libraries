@@ -11,6 +11,23 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_SKILL)
 	e1:SetOperation(s.flipop)
 	c:RegisterEffect(e1)
+	aux.GlobalCheck(s,function()
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EFFECT_TOSS_DICE_CHOOSE)
+		ge1:SetCondition(function(e,tp,eg,ep) return Duel.HasFlagEffect(ep,id) end)
+		ge1:SetOperation(s.repop(true,Duel.SetDiceResult,function(tp)
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(300102004,3))
+			return Duel.AnnounceNumberRange(tp,1,6)
+		end))
+		Duel.RegisterEffect(ge1,0)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EFFECT_TOSS_COIN_CHOOSE)
+		ge2:SetOperation(s.repop(false,Duel.SetCoinResult,function(tp)
+			return Duel.AnnounceCoin(tp,aux.Stringid(300102004,4))
+		end))
+		Duel.RegisterEffect(ge2,0)
+	end)
 end
 function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SKILL_FLIP,tp,id|(1<<32))
@@ -26,6 +43,7 @@ function s.flipop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.RegisterFlagEffect(ep,id,0,0,0)
 end
+--replace draw
 function s.prdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0 and Duel.GetTurnPlayer()==tp
 		and Duel.GetDrawCount(tp)>0 and (Duel.GetTurnCount()>1 or Duel.IsDuelType(DUEL_1ST_TURN_DRAW))
@@ -43,5 +61,28 @@ function s.prdop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.DisableShuffleCheck()
 		Duel.MoveToDeckTop(sg)
 		if #sg>1 then Duel.SortDecktop(tp,tp,#sg) end
+	end
+end
+--replace coin and dice
+function s.repop(isdice,func2,func3)
+	return function(e,tp,eg,ep,ev,re,r,rp)
+		local total=(ev&0xff)+(ev>>16)
+		local res={}
+		--ask if you want to activate the skill or not
+		if Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			--replace
+			for i=1,total do
+				table.insert(res,func3(ep))
+			end
+		else
+			for i=1,total do
+				if isdice then
+					table.insert(res,Duel.GetRandomNumber(1,6))
+				else
+					table.insert(res,Duel.GetRandomNumber(0,1)==0 and COIN_TAILS or COIN_HEADS)
+				end
+			end
+		end
+		func2(table.unpack(res))
 	end
 end
